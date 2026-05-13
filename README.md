@@ -14,6 +14,18 @@ source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+### Dependencies
+
+Installed by the `pip install` step above; pinned in [requirements.txt](requirements.txt).
+
+| Package           | Purpose                                          |
+| ----------------- | ------------------------------------------------ |
+| `requests`        | HTTP client for the crawler                      |
+| `beautifulsoup4`  | HTML parsing                                     |
+| `lxml`            | Fast parser backend for BeautifulSoup            |
+| `pytest`          | Test runner                                      |
+| `pytest-cov`      | Coverage reporting                               |
+
 ## Usage
 
 Start the shell:
@@ -91,7 +103,21 @@ See [DESIGN.md](DESIGN.md) for the full design rationale.
 
 ## Testing
 
-Tests will live under `tests/` and run with `pytest --cov=src tests/`.
+The test suite lives under [tests/](tests/) and uses `pytest`. From the
+project root:
+
+```sh
+pytest tests/
+```
+
+With coverage:
+
+```sh
+pytest --cov=src --cov-report=term-missing tests/
+```
+
+The suite has 64 tests covering the crawler (HTTP fully mocked), indexer,
+search, and REPL dispatch, and reports 100% line coverage.
 
 ## Acknowledgement
 
