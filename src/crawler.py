@@ -107,7 +107,7 @@ class Crawler:
                 continue
             log.info("skipping %s — HTTP %d", url, status)
             return None
-        return None
+        return None  # pragma: no cover  -- unreachable; loop always returns
 
     def _extract_links(self, base_url: str, html: str) -> list[str]:
         soup = BeautifulSoup(html, "lxml")
