@@ -72,19 +72,27 @@ nonsense: 1 document(s)
 
 ### `find <word> [<word> ...]`
 
-Returns the pages containing **all** the given words (conjunctive AND query).
+Returns the pages containing **all** the given words (conjunctive AND query),
+ranked by descending TF-IDF score. Each line shows the score and the URL.
 
 ```text
 > find indifference
-https://quotes.toscrape.com/page/3/
+0.2172  https://quotes.toscrape.com/tag/indifference/page/1/
+0.1810  https://quotes.toscrape.com/tag/activism/page/1/
+0.1810  https://quotes.toscrape.com/tag/apathy/page/1/
+...
 
 > find good friends
-https://quotes.toscrape.com/
-https://quotes.toscrape.com/tag/friends/
+0.0817  https://quotes.toscrape.com/tag/contentment/page/1/
+0.0724  https://quotes.toscrape.com/tag/good/page/1/
+0.0351  https://quotes.toscrape.com/tag/aliteracy/page/1/
+...
 ```
 
-If any word is absent from the index, or the query is empty, the shell prints
-`no results`.
+The score uses length-normalized TF and classic IDF,
+$\operatorname{score}(q, d) = \sum_{t \in q} \frac{\operatorname{freq}(t, d)}{\operatorname{length}(d)} \cdot \ln\!\left(\frac{N}{\operatorname{df}(t)}\right)$;
+see [DESIGN.md](DESIGN.md) §3.4 for the rationale. If any word is absent from the index, or the query is empty,
+the shell prints `no results`.
 
 Type `help` for the in-shell command list, or `exit` to quit.
 

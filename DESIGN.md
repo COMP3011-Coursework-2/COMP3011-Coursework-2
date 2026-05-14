@@ -91,10 +91,47 @@ a concern.
 - **`print <word>`** — look the word up in the index and print its
   inverted index entry (postings: URL, frequency, positions).
 - **`find <w1> <w2> …`** — look up each word, intersect the sets of
-  URLs in their postings, and return the result. An empty intersection
-  prints a friendly "no results" message.
+  URLs in their postings, score each matched URL by TF-IDF, and print
+  results in descending score order. An empty intersection prints a
+  friendly "no results" message.
 - **Edge cases handled:** word not in index, empty query, query with
-  only whitespace, mixed case.
+  only whitespace, mixed case, repeated query terms (deduplicated).
+
+#### Ranking — TF-IDF
+
+For each matched document $d$ and query $q$:
+
+$$
+\operatorname{TF}(t, d) = \frac{\operatorname{freq}(t, d)}{\operatorname{length}(d)}
+\qquad
+\operatorname{IDF}(t) = \ln\!\left(\frac{N}{\operatorname{df}(t)}\right)
+$$
+
+$$
+\operatorname{score}(q, d) = \sum_{t \in q} \operatorname{TF}(t, d) \cdot \operatorname{IDF}(t)
+$$
+
+where $N$ is the number of indexed documents, $\operatorname{df}(t)$ is the
+number of documents containing $t$, $\operatorname{freq}(t, d)$ is the term
+frequency in $d$, and $\operatorname{length}(d)$ is the document's token
+count.
+
+- **Length normalization** prevents bias toward long documents (a 1000-
+  word page would otherwise dominate a 50-word page with the same
+  proportional usage).
+- **Classic (unsmoothed) IDF** is chosen because for a 50-page corpus
+  it is the most transparent formula, and smoothing's only practical
+  benefit — guarding against $\operatorname{df}(t) = 0$ — is
+  unreachable: `find_pages` early-returns `[]` if any query term has
+  no postings, so by the time IDF is computed every term has
+  $\operatorname{df}(t) \geq 1$.
+- **Ties** (equal scores, e.g. when every query term has
+  $\operatorname{df}(t) = N$) are broken alphabetically by URL so
+  output is deterministic.
+- **No format change.** Every statistic needed ($N$,
+  $\operatorname{df}$, $\operatorname{freq}$, $\operatorname{length}$)
+  is already in the existing index, so adding ranking did not require
+  re-crawling or modifying `data/index.json`.
 
 ## 4. Technical Stack
 
