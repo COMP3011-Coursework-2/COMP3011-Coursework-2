@@ -111,8 +111,8 @@ class Shell:
         if not results:
             print("no results")
             return
-        for url in results:
-            print(url)
+        for url, score in results:
+            print(f"{score:.4f}  {url}")
 
 
 def main() -> int:

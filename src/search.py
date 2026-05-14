@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from indexer import Indexer
@@ -42,9 +43,33 @@ def print_postings(idx: Indexer, word: str) -> str:
     return "\n".join(lines)
 
 
-def find_pages(idx: Indexer, terms: list[str]) -> list[str]:
-    """Return URLs that contain every term (conjunctive AND query)."""
-    cleaned = [t.lower() for t in terms if t.strip()]
+def _idf(idx: Indexer, term: str) -> float:
+    """Inverse document frequency for ``term`` (classic, base e).
+
+    Only called after ``find_pages`` has verified the term has postings,
+    so ``df >= 1`` is guaranteed.
+    """
+    df = len(idx.index[term])
+    return math.log(idx.num_documents / df)
+
+
+def _score(idx: Indexer, terms: list[str], url: str) -> float:
+    """Length-normalized TF-IDF score of ``url`` against ``terms``.
+
+    Only called on AND-matched URLs, which therefore have ``length >= 1``.
+    """
+    length = idx.docs[url]["length"]
+    total = 0.0
+    for term in terms:
+        freq = idx.index[term][url]["freq"]
+        total += (freq / length) * _idf(idx, term)
+    return total
+
+
+def find_pages(idx: Indexer, terms: list[str]) -> list[tuple[str, float]]:
+    """Return ``(url, score)`` pairs for pages matching every term, ranked by
+    descending TF-IDF score (ties broken alphabetically by URL)."""
+    cleaned = list(dict.fromkeys(t.lower() for t in terms if t.strip()))
     if not cleaned:
         return []
 
@@ -55,5 +80,7 @@ def find_pages(idx: Indexer, terms: list[str]) -> list[str]:
             return []
         url_sets.append(set(postings.keys()))
 
-    result = set.intersection(*url_sets)
-    return sorted(result)
+    matched = set.intersection(*url_sets)
+    scored = [(url, _score(idx, cleaned, url)) for url in matched]
+    scored.sort(key=lambda pair: (-pair[1], pair[0]))
+    return scored
