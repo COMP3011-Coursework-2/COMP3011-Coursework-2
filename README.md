@@ -90,7 +90,7 @@ ranked by descending TF-IDF score. Each line shows the score and the URL.
 ```
 
 The score uses length-normalized TF and classic IDF,
-$\operatorname{score}(q, d) = \sum_{t \in q} \frac{\operatorname{freq}(t, d)}{\operatorname{length}(d)} \cdot \ln\!\left(\frac{N}{\operatorname{df}(t)}\right)$;
+$\mathrm{score}(q, d) = \sum_{t \in q} \frac{\mathrm{freq}(t, d)}{\mathrm{length}(d)} \cdot \ln\!\left(\frac{N}{\mathrm{df}(t)}\right)$;
 see [DESIGN.md](DESIGN.md) §3.4 for the rationale. If any word is absent from the index, or the query is empty,
 the shell prints `no results`.
 
