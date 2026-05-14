@@ -124,8 +124,10 @@ With coverage:
 pytest --cov=src --cov-report=term-missing tests/
 ```
 
-The suite has 64 tests covering the crawler (HTTP fully mocked), indexer,
-search, and REPL dispatch, and reports 100% line coverage.
+The suite has 69 tests covering the crawler (HTTP fully mocked), indexer,
+search, and REPL dispatch, and reports 100% line coverage. See
+[TESTING.md](TESTING.md) for the full strategy, per-module breakdown, and
+mocking conventions.
 
 ## Acknowledgement
 
