@@ -143,7 +143,7 @@ count.
 
 ## 5. Repository Structure
 
-```
+```txt
 COMP3011-Coursework-2/
 ├── src/
 │   ├── crawler.py
